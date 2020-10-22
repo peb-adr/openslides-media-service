@@ -6,6 +6,7 @@ import sys
 from flask import Flask, Response, request
 
 from .auth import get_mediafile_id
+from .cache import Cache
 from .database import Database
 from .exceptions import HttpError, NotFoundError
 
@@ -20,6 +21,9 @@ all_configs = (
     ("DB_USER", str, None),
     ("DB_PASSWORD", str, None),
     ("BLOCK_SIZE", int, 4096),
+    ("CACHE_SIZE", int, 10),
+    ("CACHE_DATA_MIN_SIZE_KB", int, 0),
+    ("CACHE_DATA_MAX_SIZE_KB", int, 10 * 1024),
 )
 
 app = Flask(__name__)
@@ -60,7 +64,7 @@ for config, type, default in all_configs:
                 sys.exit(1)
         app.config[config] = value
 
-database = Database(app)
+database = Cache(Database(app))
 
 # Ready!
 app.logger.info("Started Media-Server")
@@ -92,7 +96,7 @@ def serve(path):
     # Send data (chunked)
     def chunked(size, source):
         for i in range(0, len(source), size):
-            yield bytes(source[i : i + size])
+            yield bytes(source[i : i + size])  # noqa
 
     block_size = app.config["BLOCK_SIZE"]
     return Response(chunked(block_size, data), mimetype=mimetype)

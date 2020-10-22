@@ -10,6 +10,7 @@ class Database:
         self.connection = None
 
     def get_mediafile(self, id):
+        """ Returns data, mimetype """
         while True:
             connection = self.get_connection()
             try:
