@@ -5,7 +5,6 @@ export DB_PORT="${DB_PORT:-5432}"
 export DB_NAME="${DB_NAME:-mediafiledata}"
 export DB_USER="${DB_USER:-openslides}"
 export DB_PASSWORD="${DB_PASSWORD:-openslides}"
-PGPASSWORD="$DB_PASSWORD"
 
 until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do
   echo "Waiting for Postgres server '$DB_HOST' to become available..."
@@ -13,6 +12,6 @@ until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do
 done
 
 # Create schema in postgresql
-psql -1 -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -f src/schema.sql
+PGPASSWORD="$DB_PASSWORD" psql -1 -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -f src/schema.sql
 
 exec "$@"
