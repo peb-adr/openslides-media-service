@@ -102,6 +102,11 @@ def serve(path):
     return Response(chunked(block_size, data), mimetype=mimetype)
 
 
+@app.route("/health")
+def health():
+    return {"healthy": True}
+
+
 def shutdown():
     app.logger.info("Stopping the server...")
     global database
