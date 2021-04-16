@@ -41,11 +41,11 @@ class Database:
     def create_connection(self):
         try:
             return psycopg2.connect(
-                host=self.config["DB_HOST"],
-                port=self.config["DB_PORT"],
-                database=self.config["DB_NAME"],
-                user=self.config["DB_USER"],
-                password=self.config["DB_PASSWORD"],
+                host=self.config["DATABASE_HOST"],
+                port=self.config["DATABASE_PORT"],
+                database=self.config["DATABASE_NAME"],
+                user=self.config["DATABASE_USER"],
+                password=self.config["DATABASE_PASSWORD"],
             )
         except psycopg2.Error as e:
             self.logger.error(f"Error during connect to the database: {repr(e)}")
