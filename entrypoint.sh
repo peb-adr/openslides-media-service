@@ -1,17 +1,17 @@
 #!/bin/bash
 
-export DB_HOST="${DB_HOST:-db}"
-export DB_PORT="${DB_PORT:-5432}"
-export DB_NAME="${DB_NAME:-mediafiledata}"
-export DB_USER="${DB_USER:-openslides}"
-export DB_PASSWORD="${DB_PASSWORD:-openslides}"
+export DATABASE_HOST="${DATABASE_HOST:-db}"
+export DATABASE_PORT="${DATABASE_PORT:-5432}"
+export DATABASE_NAME="${DATABASE_NAME:-mediafiledata}"
+export DATABASE_USER="${DATABASE_USER:-openslides}"
+export DATABASE_PASSWORD="${DATABASE_PASSWORD:-openslides}"
 
-until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do
-  echo "Waiting for Postgres server '$DB_HOST' to become available..."
+until pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
+  echo "Waiting for Postgres server '$DATABASE_HOST' to become available..."
   sleep 3
 done
 
 # Create schema in postgresql
-PGPASSWORD="$DB_PASSWORD" psql -1 -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -f src/schema.sql
+PGPASSWORD="$DATABASE_PASSWORD" psql -1 -h "$DATABASE_HOST" -U "$DATABASE_USER" -d "$DATABASE_NAME" -f src/schema.sql
 
 exec "$@"

@@ -13,8 +13,8 @@ variables. Configs without default must be specified. All configs (see
   the default, all files must be requested this way: `/media/<path>`.
 - `CHECK_REQUEST_URL`: The url to make the chack request to. The host and port
   must be given. E.g.: `worker:8000/check-media/`
-- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`: The host, port,
-  database name, user and password for the mediafile db
+- `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD`:
+  The host, port, database name, user and password for the mediafile db
 - `BLOCK_SIZE`: Default 4096. The size of the blocks, the file is chunked into.
   4096 seems to be a good default (inspired by Django).
 - `CACHE_SIZE`: Default 10. The size of the LRU cache for the mediafiledata db.
