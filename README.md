@@ -57,7 +57,6 @@ The name `mediafiles` must not be altered.
   
 
 ## TODOs:
- - support different ports than 5432 in dockerfile
  - Development in docker
  - Tests
  - Name confusion: media-server vs media-service. Be constant here and name it

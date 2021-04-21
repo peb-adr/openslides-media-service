@@ -13,7 +13,8 @@ until pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
 done
 
 # Create schema in postgresql
-PGPASSWORD="$DATABASE_PASSWORD" psql -1 -h "$DATABASE_HOST" -U "$DATABASE_USER" \
-  -d "$DATABASE_NAME" -vt="$DATABASE_TABLE" -f src/schema.sql
+PGPASSWORD="$DATABASE_PASSWORD" psql -1 -h "$DATABASE_HOST" -p "$DATABASE_PORT" \
+  -U "$DATABASE_USER" -d "$DATABASE_NAME" -vt="$DATABASE_TABLE" \
+  -f src/schema.sql
 
 exec "$@"
