@@ -18,6 +18,7 @@ all_configs = (
     ("DATABASE_HOST", str, None),
     ("DATABASE_PORT", int, None),
     ("DATABASE_NAME", str, None),
+    ("DATABASE_TABLE", str, None),
     ("DATABASE_USER", str, None),
     ("DATABASE_PASSWORD", str, None),
     ("BLOCK_SIZE", int, 4096),

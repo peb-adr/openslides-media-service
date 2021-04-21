@@ -39,7 +39,7 @@ the `dev.sh` script.
 
 To prepare the database (maybe clear it first: `dropdb mediafiledata && createdb mediafiledata`), execute the following command:
 
-    psql -1 -h <host> -U <user> -d mediafiledata -f src/schema.sql
+    psql -1 -h <host> -U <user> -d <database> -vt=<table> -f src/schema.sql
 
 # Configure the main OpenSlides worker:
 Add a special database to the `DATABASES` configuration:
