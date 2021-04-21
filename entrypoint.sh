@@ -13,8 +13,14 @@ until pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
 done
 
 # Create schema in postgresql
-PGPASSWORD="$DATABASE_PASSWORD" psql -1 -h "$DATABASE_HOST" -p "$DATABASE_PORT" \
-  -U "$DATABASE_USER" -d "$DATABASE_NAME" -vt="$DATABASE_TABLE" \
-  -f src/schema.sql
+echo "INFO: Setting up table ${DATABASE_TABLE} in database ${DATABASE_NAME} for media file storage."
+PGPASSWORD="$DATABASE_PASSWORD" psql -1 -vON_ERROR_STOP=1 \
+  -h "$DATABASE_HOST" -p "$DATABASE_PORT" -U "$DATABASE_USER" \
+  -d "$DATABASE_NAME" -vt="$DATABASE_TABLE" \
+  -f src/schema.sql ||
+{
+  echo "ERROR: Setup of mediafile table ${DATABASE_TABLE} in database ${DATABASE_NAME} failed! Aborting."
+  exit 23
+}
 
 exec "$@"
