@@ -14,6 +14,5 @@ COPY src/* src/
 COPY entrypoint.sh .
 
 EXPOSE 8000
-# TODO: Make the port configurable via ENV
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["gunicorn", "--access-logfile", "-", "--error-logfile", "-", "-b", "0.0.0.0:8000", "src.mediaserver:app"]

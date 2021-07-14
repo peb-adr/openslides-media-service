@@ -16,8 +16,9 @@ class Database:
             try:
                 with connection:
                     with connection.cursor() as cur:
+                        table = self.config["DATABASE_TABLE"]
                         cur.execute(
-                            "SELECT data, mimetype FROM mediafile_data WHERE id=%s",
+                            f"SELECT data, mimetype FROM {table} WHERE id=%s",
                             [id],
                         )
                         row = cur.fetchone()

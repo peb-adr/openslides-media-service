@@ -39,7 +39,7 @@ the `dev.sh` script.
 
 To prepare the database (maybe clear it first: `dropdb mediafiledata && createdb mediafiledata`), execute the following command:
 
-    psql -1 -h <host> -U <user> -d mediafiledata -f src/schema.sql
+    psql -1 -h <host> -U <user> -d <database> -vt=<table> -f src/schema.sql
 
 # Configure the main OpenSlides worker:
 Add a special database to the `DATABASES` configuration:
@@ -57,7 +57,6 @@ The name `mediafiles` must not be altered.
   
 
 ## TODOs:
- - support different ports than 5432 in dockerfile
  - Development in docker
  - Tests
  - Name confusion: media-server vs media-service. Be constant here and name it
