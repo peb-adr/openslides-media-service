@@ -7,7 +7,9 @@ export DATABASE_USER="${DATABASE_USER:-openslides}"
 export DATABASE_PASSWORD="${DATABASE_PASSWORD:-openslides}"
 export DATABASE_TABLE="${DATABASE_TABLE:-mediafile_data}"
 
-until pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
+until pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT" \
+    -U "$DATABASE_USER" -d "$DATABASE_NAME"
+do
   echo "Waiting for Postgres server '$DATABASE_HOST' to become available..."
   sleep 3
 done
