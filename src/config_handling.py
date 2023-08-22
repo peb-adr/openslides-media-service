@@ -1,6 +1,8 @@
 import os
 import sys
 
+from flask import current_app as app
+
 DEV_MODE_ENVIRONMENT_VAR = "OPENSLIDES_DEVELOPMENT"
 DEV_SECRET = "openslides"
 
@@ -11,6 +13,7 @@ CONFIG_DEFAULTS = {
     "MEDIA_DATABASE_USER": "openslides",
     "MEDIA_DATABASE_PASSWORD_FILE": "/run/secrets/postgres_password",
     "MEDIA_BLOCK_SIZE": 4096,
+    "MEDIA_CLIENT_CACHE_DURATION": 86400,
     "PRESENTER_HOST": "backend",
     "PRESENTER_PORT": 9003,
 }
@@ -20,7 +23,7 @@ def get_type_for(config_value):
     return type(CONFIG_DEFAULTS[config_value])
 
 
-def init_config(app):
+def init_config():
     for config, default in CONFIG_DEFAULTS.items():
         if config.endswith("_FILE"):
             value = get_config_from(config)
