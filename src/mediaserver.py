@@ -1,21 +1,25 @@
 import atexit
 import base64
 import json
+import sys
+from functools import partial
+from signal import SIGINT, SIGTERM, signal
 
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, jsonify, redirect, request
 
-from .auth import AUTH_HEADER, check_file_id
+from .auth import AUTHENTICATION_HEADER, check_file_id, check_login
 from .config_handling import init_config, is_dev_mode
 from .database import Database
 from .exceptions import BadRequestError, HttpError, NotFoundError
 from .logging import init_logging
 
 app = Flask(__name__)
-init_logging(app)
-init_config(app)
-database = Database(app)
+with app.app_context():
+    init_logging()
+    init_config()
+    database = Database()
 
-app.logger.info("Started Media-Server")
+app.logger.info("Started media server")
 
 
 @app.errorhandler(HttpError)
@@ -30,25 +34,17 @@ def handle_view_error(error):
     return response
 
 
-@app.route("/system/media/get/<int:mediafile_id>")
-def serve(mediafile_id):
-    return serve_files(mediafile_id, "mediafile")
+@app.route("/system/media/get/<int:file_id>")
+def serve(file_id):
+    if not check_login():
+        return redirect("/")
 
-
-@app.route("/system/media/get_resource/<int:resource_id>")
-def serve_resource(resource_id):
-    return serve_files(resource_id, "resource")
-
-
-def serve_files(file_id, file_type):
     # get file id
     presenter_headers = dict(request.headers)
     del_keys = [key for key in presenter_headers if "content" in key]
     for key in del_keys:
         del presenter_headers[key]
-    ok, filename, auth_header = check_file_id(
-        file_id, file_type, app, presenter_headers
-    )
+    ok, filename, auth_header = check_file_id(file_id, presenter_headers)
     if not ok:
         raise NotFoundError()
 
@@ -56,7 +52,7 @@ def serve_files(file_id, file_type):
 
     # Query file from db
     global database
-    data, mimetype = database.get_file(file_id, file_type)
+    data, mimetype = database.get_file(file_id)
 
     # Send data (chunked)
     def chunked(size, source):
@@ -69,26 +65,17 @@ def serve_files(file_id, file_type):
     filename_latin1 = filename.encode("latin1", errors="replace").decode("latin1")
     response.headers["Content-Disposition"] = f'inline; filename="{filename_latin1}"'
 
-    client_cache_duration = int(app.config["MEDIA_CLIENT_CACHE_DURATION"])
+    client_cache_duration = int(app.config["MEDIA_CLIENT_CACHE_DURATION"] or 0)
     if client_cache_duration > 0 and not is_dev_mode():
         response.headers["Cache-Control"] = f"private, max-age={client_cache_duration}"
 
     if auth_header:
-        response.headers[AUTH_HEADER] = auth_header
+        response.headers[AUTHENTICATION_HEADER] = auth_header
     return response
 
 
 @app.route("/internal/media/upload_mediafile/", methods=["POST"])
 def media_post():
-    return file_post("mediafile")
-
-
-@app.route("/internal/media/upload_resource/", methods=["POST"])
-def resource_post():
-    return file_post("resource")
-
-
-def file_post(file_type):
     dejson = get_json_from_request()
     try:
         file_data = base64.b64decode(dejson["file"].encode())
@@ -101,9 +88,9 @@ def file_post(file_type):
         raise BadRequestError(
             f"The post request.data is not in right format: {request.data}"
         )
-    app.logger.debug(f"to database {file_type} {file_id} {mimetype}")
+    app.logger.debug(f"to database {file_id} {mimetype}")
     global database
-    database.set_mediafile(file_id, file_type, file_data, mimetype)
+    database.set_mediafile(file_id, file_data, mimetype)
     return "", 200
 
 
@@ -113,9 +100,9 @@ def duplicate_mediafile():
     app.logger.debug(f"source_id {source_id} and target_id {target_id}")
     global database
     # Query file source_id from db
-    data, mimetype = database.get_file(source_id, "mediafile")
+    data, mimetype = database.get_file(source_id)
     # Insert mediafile in target_id into db
-    database.set_mediafile(target_id, "mediafile", data, mimetype)
+    database.set_mediafile(target_id, data, mimetype)
     return "", 200
 
 
@@ -146,3 +133,6 @@ def shutdown(database):
 
 
 atexit.register(shutdown, database)
+
+for sig in (SIGTERM, SIGINT):
+    signal(sig, partial(sys.exit, 0))
