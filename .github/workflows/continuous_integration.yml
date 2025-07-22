@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI - Build and Test Service
 
 on: [ push, pull_request ]
 
@@ -10,14 +10,14 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Run tests
-      run: make run-tests
-    
+      run: make run-tests-ci
+
     - name: Run black
       run: make check-black
-    
+
     - name: Run isort
       run: make check-isort
-    
+
     - name: Run flake8
       run: make flake8
 
