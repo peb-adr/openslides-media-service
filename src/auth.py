@@ -1,15 +1,15 @@
 from urllib import parse
 
 import requests
-from authlib import (
+from flask import current_app as app
+from flask import request
+from osauthlib import (
     AUTHENTICATION_HEADER,
     COOKIE_NAME,
     AuthenticateException,
     AuthHandler,
     InvalidCredentialsException,
 )
-from flask import current_app as app
-from flask import request
 
 from .exceptions import ServerError
 
